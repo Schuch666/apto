@@ -490,7 +490,7 @@
     } catch (e) {
       // abrindo por file://, alguns navegadores bloqueiam exportar a imagem da planta
       alert('O navegador bloqueou salvar a imagem com a página aberta direto do arquivo.\n' +
-        'Abra por um servidor local (veja o LEIA-ME.md) ou use a captura de tela.');
+        'Abra por um servidor local (veja o README.md) ou use a captura de tela.');
     }
   };
 
