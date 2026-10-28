@@ -502,7 +502,21 @@
     desenharEscala();
   }
 
+  // data do último commit no GitHub; sem acesso à API, usa a data de publicação da página
+  function mostrarDataAtualizacao() {
+    const el = $('dataAtualizacao');
+    const formatar = (d) => d.toLocaleDateString('pt-BR');
+    el.textContent = formatar(new Date(document.lastModified));
+    fetch('https://api.github.com/repos/Schuch666/ap_layout/commits?per_page=1')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((dados) => {
+        el.textContent = formatar(new Date(dados[0].commit.committer.date));
+      })
+      .catch(() => {});
+  }
+
   aplicarTema(temaSalvo());
+  mostrarDataAtualizacao();
   if (planta.complete) ajustarVista();
   else planta.addEventListener('load', ajustarVista);
   window.addEventListener('resize', ajustarVista);

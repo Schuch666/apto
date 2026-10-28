@@ -60,6 +60,9 @@ body { display: flex; flex-direction: column; }
   border-bottom: 1px solid var(--borda);
 }
 .barra h1 { font-size: 16px; margin: 0 8px 0 0; }
+.barra h1 .autor { font-weight: normal; color: var(--suave); }
+.barra h1 a { color: var(--destaque); text-decoration: none; }
+.barra h1 a:hover { text-decoration: underline; }
 .grupo { display: flex; align-items: center; gap: 6px; }
 .info { color: var(--suave); font-size: 12px; }
 
@@ -79,6 +82,8 @@ button.perigo { color: var(--perigo); }
 .corpo { flex: 1; display: flex; min-height: 0; }
 
 .lateral {
+  display: flex;
+  flex-direction: column;
   width: 280px;
   flex-shrink: 0;
   overflow-y: auto;
@@ -114,6 +119,20 @@ button.perigo { color: var(--perigo); }
 .botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
 
 .ajuda p { font-size: 12px; color: var(--suave); margin: 4px 0; line-height: 1.4; }
+
+/* rodapé encostado no fim da barra lateral */
+.rodape {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--divisor);
+  font-size: 12px;
+  color: var(--suave);
+  text-align: center;
+}
+.rodape p { margin: 6px 0; line-height: 1.4; }
+.rodape a { color: var(--suave); }
+.rodape a:hover { color: var(--texto); }
+.rodape-logo { display: inline-block; color: var(--suave); }
 
 .viewport {
   position: relative;
