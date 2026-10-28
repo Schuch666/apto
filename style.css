@@ -63,7 +63,8 @@ body { display: flex; flex-direction: column; }
 }
 .barra h1 { font-size: 16px; margin: 0 8px 0 0; }
 .barra h1 .autor { font-weight: normal; color: var(--suave); }
-.barra h1 a { color: var(--destaque); text-decoration: none; }
+/* mesmo visual de "Layout do AP"; sublinha só ao passar o mouse */
+.barra h1 a { color: var(--texto); font-weight: bold; text-decoration: none; }
 .barra h1 a:hover { text-decoration: underline; }
 .grupo { display: flex; align-items: center; gap: 6px; }
 .info { color: var(--suave); font-size: 12px; }
@@ -105,6 +106,7 @@ button.perigo { color: var(--perigo); }
   border-bottom: 1px solid var(--divisor);
 }
 .catalogo .amostra { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(0,0,0,.25); }
+.catalogo .amostra.circulo { border-radius: 50%; }
 .catalogo .nome { flex: 1; }
 .catalogo .medida { color: var(--suave); font-size: 12px; }
 .catalogo button { padding: 2px 8px; }
@@ -112,11 +114,16 @@ button.perigo { color: var(--perigo); }
 
 .form { display: flex; flex-direction: column; gap: 8px; }
 .form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--suave); flex: 1; }
-.form input { font: inherit; padding: 4px 6px; border: 1px solid var(--borda); border-radius: 4px; color: var(--texto); background: var(--entrada); }
-.form input[type=color] { padding: 0; height: 28px; }
+.form input, .form select { font: inherit; padding: 4px 6px; border: 1px solid var(--borda); border-radius: 4px; color: var(--texto); background: var(--entrada); }
+.campo-cor { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--suave); }
+/* uma coluna por tom: claro, médio e escuro de cima para baixo */
+.paleta { display: grid; grid-template-rows: repeat(3, 20px); grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; }
+.paleta button { padding: 0; border: 2px solid transparent; border-radius: 4px; }
+.paleta button:hover { border-color: var(--botao-borda-hover); }
+.paleta button.escolhida { border-color: var(--texto); }
 .linha { display: flex; gap: 8px; }
 .linha label { min-width: 0; }
-.linha input { width: 100%; }
+.linha input, .linha select { width: 100%; }
 
 .botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
 
@@ -163,8 +170,8 @@ button.perigo { color: var(--perigo); }
   border-radius: 3px;
   cursor: move;
   user-select: none;
-  overflow: hidden;
 }
+.movel.circulo { border-radius: 50%; }
 .movel.selecionado { outline: 3px solid var(--destaque); outline-offset: 2px; }
 .movel .rotulo {
   font-size: 22px;
@@ -177,6 +184,24 @@ button.perigo { color: var(--perigo); }
   white-space: nowrap;
 }
 .movel .rotulo small { display: block; font-size: 18px; opacity: .85; }
+
+/* mensagens de salvar/carregar no GitHub */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  max-width: min(560px, calc(100% - 32px));
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: var(--botao);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  box-shadow: 0 2px 10px var(--sombra);
+  z-index: 10;
+}
+.aviso.ok { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+.aviso.erro { background: #8e2932; border-color: #8e2932; color: #fff; }
 
 .dica {
   position: absolute;

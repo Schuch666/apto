@@ -7,6 +7,10 @@
   const CHAVE_TEMA = 'layout-apto-tema';
   const PASSO_GRADE = 1; // metros entre os pontos da grade
   const PLANTAS = { escuro: 'planta_escura.png', claro: 'planta_paredes_janelas_cotas.png' };
+  // layouts salvos no GitHub ficam em <PASTA_GH>/<nome>.json neste repositório
+  const REPO_GH = 'Schuch666/apto';
+  const PASTA_GH = 'layouts';
+  const CHAVE_TOKEN = 'layout-apto-token';
   const $ = (id) => document.getElementById(id);
 
   const viewport = $('viewport');
@@ -21,6 +25,7 @@
     catalogo: window.CATALOGO_PADRAO.map((c) => ({ ...c })),
     itens: [],
   };
+  mesclarPadroes();
   let selecionadoId = null;
   let vista = { zoom: 1, x: 0, y: 0 };
   let ferramenta = null; // 'calibrar' | 'medir' | null
@@ -46,6 +51,23 @@
   }
 
   const novoId = () => Math.random().toString(36).slice(2, 10);
+
+  // inclui no catálogo salvo os itens padrão que ainda não foram oferecidos (removidos não voltam)
+  // e atualiza os que já estão lá com as medidas, cor e forma atuais de catalogo.js
+  function mesclarPadroes() {
+    if (!estado.padroes) estado.padroes = estado.catalogo.map((c) => c.nome);
+    window.CATALOGO_PADRAO.forEach((c) => {
+      const salvo = estado.catalogo.find((x) => x.nome === c.nome);
+      if (salvo) Object.assign(salvo, { forma: 'retangulo' }, c);
+      if (estado.padroes.includes(c.nome)) return;
+      estado.padroes.push(c.nome);
+      if (!estado.catalogo.some((x) => x.nome === c.nome)) estado.catalogo.push({ ...c });
+    });
+  }
+
+  const circular = (c) => c.forma === 'circulo';
+  // "Ø40" para círculos, "60×75" para o resto
+  const medidaTxt = (c) => (circular(c) && c.larg === c.prof ? `Ø${c.larg}` : `${c.larg}×${c.prof}`);
 
   // ---------- tema ----------
 
@@ -121,9 +143,9 @@
     estado.catalogo.forEach((c, i) => {
       const li = document.createElement('li');
       li.innerHTML =
-        `<span class="amostra" style="background:${c.cor}"></span>` +
+        `<span class="amostra${circular(c) ? ' circulo' : ''}" style="background:${c.cor}"></span>` +
         `<span class="nome"></span>` +
-        `<span class="medida">${c.larg}×${c.prof}</span>` +
+        `<span class="medida">${medidaTxt(c)}</span>` +
         `<button title="Colocar na planta">+</button>` +
         `<button class="remover" title="Remover do catálogo">✕</button>`;
       li.querySelector('.nome').textContent = c.nome;
@@ -143,7 +165,7 @@
     camadaItens.innerHTML = '';
     estado.itens.forEach((it) => {
       const el = document.createElement('div');
-      el.className = 'movel' + (it.id === selecionadoId ? ' selecionado' : '');
+      el.className = 'movel' + (circular(it) ? ' circulo' : '') + (it.id === selecionadoId ? ' selecionado' : '');
       el.dataset.id = it.id;
       el.style.width = (it.larg / 100) * s + 'px';
       el.style.height = (it.prof / 100) * s + 'px';
@@ -155,7 +177,7 @@
       rot.className = 'rotulo';
       rot.textContent = it.nome;
       const med = document.createElement('small');
-      med.textContent = `${it.larg}×${it.prof} cm`;
+      med.textContent = `${medidaTxt(it)} cm`;
       rot.appendChild(med);
       el.appendChild(rot);
       camadaItens.appendChild(el);
@@ -169,9 +191,10 @@
     if (!it) return;
     const f = $('formSel');
     // não sobrescreve o campo que o usuário está editando
-    ['nome', 'larg', 'prof', 'rot', 'cor'].forEach((k) => {
-      if (document.activeElement !== f.elements[k]) f.elements[k].value = it[k];
+    ['nome', 'larg', 'prof', 'rot', 'cor', 'forma'].forEach((k) => {
+      if (document.activeElement !== f.elements[k]) f.elements[k].value = it[k] ?? 'retangulo';
     });
+    marcarPaleta(f);
   }
 
   function desenharEscala() {
@@ -236,6 +259,7 @@
       larg: c.larg,
       prof: c.prof,
       cor: c.cor,
+      forma: c.forma || 'retangulo',
       rot: 0,
       x: cx / estado.escala,
       y: cy / estado.escala,
@@ -384,6 +408,35 @@
 
   // ---------- formulários e botões ----------
 
+  // paleta de cores: cada botão grava a cor no campo escondido "cor" do formulário
+  function montarPaleta(form) {
+    const caixa = form.querySelector('.paleta');
+    window.PALETA.flat().forEach((cor) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.style.background = cor;
+      b.dataset.cor = cor;
+      b.title = cor;
+      b.onclick = () => {
+        form.elements.cor.value = cor;
+        marcarPaleta(form);
+        form.elements.cor.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      caixa.appendChild(b);
+    });
+    marcarPaleta(form);
+  }
+
+  function marcarPaleta(form) {
+    const atual = form.elements.cor.value.toLowerCase();
+    form.querySelectorAll('.paleta button').forEach((b) => {
+      b.classList.toggle('escolhida', b.dataset.cor === atual);
+    });
+  }
+
+  montarPaleta($('formNovo'));
+  montarPaleta($('formSel'));
+
   $('formNovo').addEventListener('submit', (ev) => {
     ev.preventDefault();
     const f = ev.target.elements;
@@ -392,10 +445,12 @@
       larg: Math.round(+f.larg.value),
       prof: Math.round(+f.prof.value),
       cor: f.cor.value,
+      forma: f.forma.value,
     });
     salvar();
     desenharCatalogo();
     ev.target.reset();
+    marcarPaleta(ev.target);
   });
 
   $('formSel').addEventListener('input', (ev) => {
@@ -458,16 +513,191 @@
     ev.target.value = '';
     if (!arq) return;
     try {
-      const dados = JSON.parse(await arq.text());
-      if (!Array.isArray(dados.itens) || !(dados.escala > 0)) throw new Error('formato inválido');
-      estado = { escala: dados.escala, catalogo: dados.catalogo || [], itens: dados.itens };
-      selecionadoId = null;
-      salvar();
-      desenharTudo();
+      aplicarDados(JSON.parse(await arq.text()));
     } catch (e) {
       alert('Não foi possível importar: ' + e.message);
     }
   };
+
+  function aplicarDados(dados) {
+    if (!dados || !Array.isArray(dados.itens) || !(dados.escala > 0)) throw new Error('formato inválido');
+    estado = {
+      escala: dados.escala,
+      catalogo: dados.catalogo || [],
+      itens: dados.itens,
+      padroes: dados.padroes,
+      nome: dados.nome,
+    };
+    mesclarPadroes();
+    selecionadoId = null;
+    salvar();
+    desenharTudo();
+  }
+
+  // ---------- salvar / carregar no GitHub ----------
+  // Carregar funciona para qualquer pessoa (repositório público). Salvar exige um token do GitHub
+  // com permissão de escrita em "Contents" neste repositório; ele fica guardado só neste navegador.
+
+  const ACEITA_RAW = 'application/vnd.github.raw+json';
+  let tempoAviso;
+
+  function avisar(msg, tipo) {
+    const el = $('aviso');
+    clearTimeout(tempoAviso);
+    el.textContent = msg || '';
+    el.className = 'aviso' + (tipo ? ' ' + tipo : '');
+    el.hidden = !msg;
+    if (msg && tipo) tempoAviso = setTimeout(() => (el.hidden = true), tipo === 'erro' ? 10000 : 5000);
+  }
+
+  // "Sala com sofá!" -> "sala-com-sofa"
+  const nomeArquivo = (nome) =>
+    nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+
+  function paraBase64(txt) {
+    let bin = '';
+    new TextEncoder().encode(txt).forEach((b) => (bin += String.fromCharCode(b)));
+    return btoa(bin);
+  }
+
+  function lerToken() {
+    try {
+      return localStorage.getItem(CHAVE_TOKEN) || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function guardarToken(token) {
+    try {
+      if (token) localStorage.setItem(CHAVE_TOKEN, token);
+      else localStorage.removeItem(CHAVE_TOKEN);
+    } catch (e) {
+      // sem armazenamento: o token será pedido de novo na próxima vez
+    }
+  }
+
+  function pedirToken() {
+    const atual = lerToken();
+    if (atual) return atual;
+    const token = (prompt(
+      'Para salvar no GitHub é preciso um token de acesso com permissão de escrita em\n' +
+      `"Contents" no repositório ${REPO_GH} (GitHub > Settings > Developer settings >\n` +
+      'Personal access tokens > Fine-grained tokens).\n\n' +
+      'O token fica guardado só neste navegador. Cole o token:'
+    ) || '').trim();
+    if (token) guardarToken(token);
+    return token;
+  }
+
+  function api(caminho, opcoes = {}, token = lerToken()) {
+    const headers = { Accept: 'application/vnd.github+json', ...(opcoes.headers || {}) };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return fetch(`https://api.github.com/repos/${REPO_GH}${caminho}`, { cache: 'no-store', ...opcoes, headers });
+  }
+
+  function erroApi(r, escrita) {
+    const motivos = {
+      401: 'token inválido ou expirado',
+      403: escrita ? 'o token não tem permissão de escrita neste repositório' : 'acesso negado ou limite de uso da API atingido',
+      404: escrita ? 'repositório não encontrado ou token sem acesso a ele' : 'não encontrado',
+      409: 'o arquivo mudou no GitHub durante o envio; tente de novo',
+      422: 'dados recusados pelo GitHub',
+    };
+    // token recusado: esquece para pedir outro na próxima tentativa
+    if (r.status === 401 || (escrita && (r.status === 403 || r.status === 404))) guardarToken('');
+    return new Error(`${motivos[r.status] || 'falha na comunicação com o GitHub'} (HTTP ${r.status})`);
+  }
+
+  async function salvarGithub() {
+    const nome = (prompt('Nome do layout:', estado.nome || '') || '').trim();
+    if (!nome) return;
+    const arq = nomeArquivo(nome);
+    if (!arq) {
+      avisar('Nome inválido: use letras ou números.', 'erro');
+      return;
+    }
+    const token = pedirToken();
+    if (!token) return;
+    const caminho = `/contents/${PASTA_GH}/${arq}.json`;
+    try {
+      avisar('Salvando no GitHub…');
+      // se já existe, o GitHub exige o sha da versão atual para substituir
+      let sha;
+      const existente = await api(caminho, {}, token);
+      if (existente.ok) {
+        if (!confirm(`Já existe um layout salvo como "${arq}". Substituir?`)) {
+          avisar('');
+          return;
+        }
+        sha = (await existente.json()).sha;
+      } else if (existente.status !== 404) {
+        throw erroApi(existente, true);
+      }
+
+      estado.nome = nome;
+      salvar();
+      const conteudo = JSON.stringify(estado, null, 2);
+      const r = await api(caminho, {
+        method: 'PUT',
+        body: JSON.stringify({ message: `Layout: ${nome}`, content: paraBase64(conteudo), sha }),
+      }, token);
+      if (!r.ok) throw erroApi(r, true);
+
+      // verificação: relê o arquivo no commit recém-criado e compara com o que foi enviado
+      const commit = (await r.json()).commit.sha;
+      const conf = await api(`${caminho}?ref=${commit}`, { headers: { Accept: ACEITA_RAW } }, token);
+      if (!conf.ok || (await conf.text()) !== conteudo) {
+        throw new Error('o envio foi aceito, mas o arquivo salvo não confere; tente de novo');
+      }
+      avisar(`Layout "${nome}" salvo no GitHub (${PASTA_GH}/${arq}.json).`, 'ok');
+    } catch (e) {
+      avisar('Erro ao salvar: ' + e.message, 'erro');
+    }
+  }
+
+  async function carregarGithub() {
+    try {
+      avisar('Buscando layouts salvos…');
+      const r = await api(`/contents/${PASTA_GH}`);
+      if (r.status === 404) {
+        avisar('Ainda não há layouts salvos no GitHub.', 'erro');
+        return;
+      }
+      if (!r.ok) throw erroApi(r);
+      const nomes = (await r.json())
+        .filter((f) => f.type === 'file' && f.name.endsWith('.json'))
+        .map((f) => f.name.slice(0, -5));
+      if (!nomes.length) {
+        avisar('Ainda não há layouts salvos no GitHub.', 'erro');
+        return;
+      }
+      avisar('');
+
+      const resp = (prompt(
+        'Layouts salvos:\n' + nomes.map((n, i) => `${i + 1}. ${n}`).join('\n') + '\n\nDigite o número ou o nome:'
+      ) || '').trim();
+      if (!resp) return;
+      const escolhido = nomes[Number(resp) - 1] || nomes.find((n) => n === nomeArquivo(resp));
+      if (!escolhido) {
+        avisar(`Layout "${resp}" não encontrado.`, 'erro');
+        return;
+      }
+      if (estado.itens.length && !confirm(`Carregar "${escolhido}"? O layout que está na tela será substituído.`)) return;
+
+      avisar('Carregando…');
+      const arq = await api(`/contents/${PASTA_GH}/${escolhido}.json`, { headers: { Accept: ACEITA_RAW } });
+      if (!arq.ok) throw erroApi(arq);
+      aplicarDados(JSON.parse(await arq.text()));
+      avisar(`Layout "${escolhido}" carregado.`, 'ok');
+    } catch (e) {
+      avisar('Erro ao carregar: ' + e.message, 'erro');
+    }
+  }
+
+  $('btnSalvarGh').onclick = salvarGithub;
+  $('btnCarregarGh').onclick = carregarGithub;
 
   // PNG do layout no tamanho da planta
   $('btnPng').onclick = () => {
@@ -494,18 +724,21 @@
       ctx.save();
       ctx.translate(it.x * s, it.y * s);
       ctx.rotate((it.rot * Math.PI) / 180);
+      ctx.beginPath();
+      if (circular(it)) ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, 2 * Math.PI);
+      else ctx.rect(-w / 2, -h / 2, w, h);
       ctx.fillStyle = it.cor + 'b3';
-      ctx.fillRect(-w / 2, -h / 2, w, h);
+      ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = 'rgba(0,0,0,.55)';
-      ctx.strokeRect(-w / 2, -h / 2, w, h);
+      ctx.stroke();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#fff';
       ctx.strokeStyle = 'rgba(0,0,0,.8)';
       ctx.lineWidth = 3;
       ctx.lineJoin = 'round';
-      [[it.nome, '22px', -11], [`${it.larg}×${it.prof} cm`, '18px', 13]].forEach(([txt, tam, y]) => {
+      [[it.nome, '22px', -11], [`${medidaTxt(it)} cm`, '18px', 13]].forEach(([txt, tam, y]) => {
         ctx.font = `${tam} system-ui, sans-serif`;
         ctx.strokeText(txt, 0, y);
         ctx.fillText(txt, 0, y);
@@ -534,7 +767,7 @@
     const el = $('dataAtualizacao');
     const formatar = (d) => d.toLocaleDateString('pt-BR');
     el.textContent = formatar(new Date(document.lastModified));
-    fetch('https://api.github.com/repos/Schuch666/ap_layout/commits?per_page=1')
+    fetch('https://api.github.com/repos/Schuch666/apto/commits?per_page=1')
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((dados) => {
         el.textContent = formatar(new Date(dados[0].commit.committer.date));

@@ -1,8 +1,8 @@
 <h1 align="center">
-  <a href="https://schuch666.github.io/ap_layout/">▶ Abrir o layout do apartamento</a>
+  <a href="https://schuch666.github.io/apto/">▶ Abrir o layout do apartamento</a>
 </h1>
 
-<p align="center"><a href="https://schuch666.github.io/ap_layout/">schuch666.github.io/ap_layout</a></p>
+<p align="center"><a href="https://schuch666.github.io/apto/">schuch666.github.io/apto</a></p>
 
 ---
 
@@ -16,7 +16,7 @@ sem instalação e sem cadastro.
 2. No **Catálogo**, clique em **+** para colocar um móvel na planta.
 3. Arraste o móvel para posicioná-lo. Ao selecionar um móvel, o painel **Selecionado** permite
    mudar nome, medidas, rotação e cor.
-4. Para móveis que não estão no catálogo, use **Novo móvel** (largura × profundidade em cm, vistos de cima).
+4. Para móveis que não estão no catálogo, use **Novo móvel** (comprimento × largura em cm, vistos de cima).
 
 | Ação | Como |
 |---|---|
@@ -36,6 +36,19 @@ sem instalação e sem cadastro.
 - **Exportar** baixa o layout em JSON; **Importar** carrega um JSON (para levar a outro computador
   ou enviar a alguém).
 - **Salvar PNG** gera uma imagem da planta com os móveis.
+- **Salvar / Carregar** guardam e abrem layouts com nome no próprio repositório, na pasta `layouts/`.
+  Carregar funciona para qualquer pessoa. Salvar exige um token do GitHub com permissão de escrita
+  neste repositório (veja abaixo); por isso, na prática, só o dono do repositório salva.
+
+#### Token para salvar
+
+1. No GitHub: *Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token*.
+2. Em *Repository access*, escolha **Only select repositories** e marque este repositório.
+3. Em *Permissions → Repository permissions*, dê **Contents: Read and write**.
+4. Gere o token e cole quando a página pedir no primeiro **Salvar**. Ele fica guardado só no navegador
+   em que foi colado; se for recusado, a página o esquece e pede de novo.
+
+Cada layout salvo vira um commit na `main`, o que também republica o site.
 
 ### Escala
 
