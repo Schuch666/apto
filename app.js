@@ -5,6 +5,7 @@
 
   const CHAVE = 'layout-apto-v1';
   const CHAVE_TEMA = 'layout-apto-tema';
+  const PASSO_GRADE = 1; // metros entre os pontos da grade
   const PLANTAS = { escuro: 'planta_escura.png', claro: 'planta_paredes_janelas_cotas.png' };
   const $ = (id) => document.getElementById(id);
 
@@ -71,6 +72,17 @@
 
   function aplicarVista() {
     palco.style.transform = `translate(${vista.x}px, ${vista.y}px) scale(${vista.zoom})`;
+    gradeFundo();
+  }
+
+  // pontos no fundo da área de visualização (fora da planta), alinhados com a grade da planta
+  function gradeFundo() {
+    const passo = PASSO_GRADE * estado.escala * vista.zoom;
+    const raio = 4 * vista.zoom;
+    viewport.style.backgroundImage =
+      `radial-gradient(circle, var(--grade) ${raio}px, transparent ${raio + 0.5}px)`;
+    viewport.style.backgroundSize = `${passo}px ${passo}px`;
+    viewport.style.backgroundPosition = `${vista.x - passo / 2}px ${vista.y - passo / 2}px`;
   }
 
   function ajustarVista() {
@@ -164,6 +176,12 @@
 
   function desenharEscala() {
     $('infoEscala').textContent = `Escala: ${estado.escala.toFixed(1)} px/m`;
+    // ladrilho centrado no ponto: desloca meio ladrilho para os pontos caírem em 0, 1 m, 2 m...
+    const passo = PASSO_GRADE * estado.escala;
+    const grade = $('grade');
+    grade.style.backgroundSize = `${passo}px ${passo}px`;
+    grade.style.backgroundPosition = `${-passo / 2}px ${-passo / 2}px`;
+    gradeFundo();
   }
 
   function desenharMedida(cursor) {
@@ -461,6 +479,15 @@
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--planta-fundo').trim();
     ctx.fillRect(0, 0, cv.width, cv.height);
     ctx.drawImage(planta, 0, 0);
+    const passo = PASSO_GRADE * s;
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--grade').trim();
+    for (let x = 0; x <= cv.width; x += passo) {
+      for (let y = 0; y <= cv.height; y += passo) {
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
     estado.itens.forEach((it) => {
       const w = (it.larg / 100) * s;
       const h = (it.prof / 100) * s;
