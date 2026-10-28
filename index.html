@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout do Apartamento</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="barra">
+  <h1>Layout do Apartamento</h1>
+  <div class="grupo">
+    <button id="btnCalibrar" title="Clique em dois pontos da planta e informe a distância real">Calibrar escala</button>
+    <button id="btnMedir" title="Clique em dois pontos para medir (Esc cancela)">Medir</button>
+    <span id="infoEscala" class="info"></span>
+  </div>
+  <div class="grupo">
+    <button id="btnZoomMenos" title="Diminuir zoom">−</button>
+    <button id="btnAjustar" title="Ajustar planta à tela">Ajustar</button>
+    <button id="btnZoomMais" title="Aumentar zoom">+</button>
+  </div>
+  <div class="grupo">
+    <button id="btnTema" title="Alternar tema claro/escuro">Tema claro</button>
+  </div>
+  <div class="grupo">
+    <button id="btnPng" title="Salvar imagem do layout">Salvar PNG</button>
+    <button id="btnExportar" title="Baixar layout em JSON">Exportar</button>
+    <button id="btnImportar" title="Carregar layout de um JSON">Importar</button>
+    <input id="arqImportar" type="file" accept="application/json,.json" hidden>
+    <button id="btnLimpar" class="perigo" title="Remover todos os móveis da planta">Limpar</button>
+  </div>
+</header>
+
+<div class="corpo">
+  <aside class="lateral">
+    <section>
+      <h2>Catálogo</h2>
+      <ul id="catalogo" class="catalogo"></ul>
+    </section>
+
+    <section>
+      <h2>Novo móvel</h2>
+      <form id="formNovo" class="form">
+        <label>Nome <input name="nome" required placeholder="ex.: Sofá 3 lugares"></label>
+        <div class="linha">
+          <label>Largura (cm) <input name="larg" type="number" min="1" step="1" required></label>
+          <label>Profund. (cm) <input name="prof" type="number" min="1" step="1" required></label>
+        </div>
+        <label>Cor <input name="cor" type="color" value="#4f8cc9"></label>
+        <button type="submit">Adicionar ao catálogo</button>
+      </form>
+    </section>
+
+    <section id="painelSel" hidden>
+      <h2>Selecionado</h2>
+      <form id="formSel" class="form">
+        <label>Nome <input name="nome"></label>
+        <div class="linha">
+          <label>Largura (cm) <input name="larg" type="number" min="1" step="1"></label>
+          <label>Profund. (cm) <input name="prof" type="number" min="1" step="1"></label>
+        </div>
+        <div class="linha">
+          <label>Rotação (°) <input name="rot" type="number" step="1"></label>
+          <label>Cor <input name="cor" type="color"></label>
+        </div>
+      </form>
+      <div class="botoes">
+        <button data-acao="girar90" title="Atalho: R">Girar 90°</button>
+        <button data-acao="girar15" title="Atalho: Shift+R">Girar 15°</button>
+        <button data-acao="duplicar" title="Atalho: D">Duplicar</button>
+        <button data-acao="excluir" class="perigo" title="Atalho: Delete">Excluir</button>
+      </div>
+    </section>
+
+    <section class="ajuda">
+      <h2>Atalhos</h2>
+      <p>Arrastar móvel: mover · Arrastar fundo: deslocar a planta · Roda do mouse: zoom</p>
+      <p>Setas: mover 1 cm (Shift: 10 cm) · R: girar 90° · D: duplicar · Delete: excluir · Esc: cancelar</p>
+    </section>
+  </aside>
+
+  <main id="viewport" class="viewport">
+    <div id="palco" class="palco">
+      <img id="planta" src="planta_escura.png" alt="Planta do apartamento" draggable="false">
+      <div id="camadaItens" class="camada"></div>
+      <svg id="camadaMedida" class="camada"></svg>
+    </div>
+    <div id="dica" class="dica" hidden></div>
+  </main>
+</div>
+
+<script src="catalogo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
