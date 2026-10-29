@@ -107,6 +107,8 @@ button.perigo { color: var(--perigo); }
 }
 .catalogo .amostra { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(0,0,0,.25); }
 .catalogo .amostra.circulo { border-radius: 50%; }
+.catalogo .amostra.porta-dir { border-radius: 0 100% 0 0; }
+.catalogo .amostra.porta-esq { border-radius: 100% 0 0 0; }
 .catalogo .nome { flex: 1; }
 .catalogo .medida { color: var(--suave); font-size: 12px; }
 .catalogo button { padding: 2px 8px; }
@@ -172,6 +174,9 @@ button.perigo { color: var(--perigo); }
   user-select: none;
 }
 .movel.circulo { border-radius: 50%; }
+/* portas: 1/4 de círculo com a dobradiça no canto de baixo */
+.movel.porta-dir { border-radius: 0 100% 0 0; }
+.movel.porta-esq { border-radius: 100% 0 0 0; }
 .movel.selecionado { outline: 3px solid var(--destaque); outline-offset: 2px; }
 .movel .rotulo {
   font-size: 22px;

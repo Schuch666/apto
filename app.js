@@ -68,6 +68,8 @@
   }
 
   const circular = (c) => c.forma === 'circulo';
+  // classe CSS da forma (retângulo não precisa de classe)
+  const classeForma = (c) => (c.forma && c.forma !== 'retangulo' ? ' ' + c.forma : '');
   // "Ø40" para círculos, "60×75" para o resto
   const medidaTxt = (c) => (circular(c) && c.larg === c.prof ? `Ø${c.larg}` : `${c.larg}×${c.prof}`);
 
@@ -145,7 +147,7 @@
     estado.catalogo.forEach((c, i) => {
       const li = document.createElement('li');
       li.innerHTML =
-        `<span class="amostra${circular(c) ? ' circulo' : ''}" style="background:${c.cor}"></span>` +
+        `<span class="amostra${classeForma(c)}" style="background:${c.cor}"></span>` +
         `<span class="nome"></span>` +
         `<span class="medida">${medidaTxt(c)}</span>` +
         `<button title="Colocar na planta">+</button>` +
@@ -167,7 +169,7 @@
     camadaItens.innerHTML = '';
     estado.itens.forEach((it) => {
       const el = document.createElement('div');
-      el.className = 'movel' + (circular(it) ? ' circulo' : '') + (it.id === selecionadoId ? ' selecionado' : '');
+      el.className = 'movel' + classeForma(it) + (it.id === selecionadoId ? ' selecionado' : '');
       el.dataset.id = it.id;
       el.style.width = (it.larg / 100) * s + 'px';
       el.style.height = (it.prof / 100) * s + 'px';
@@ -742,6 +744,19 @@
       ctx.rotate((it.rot * Math.PI) / 180);
       ctx.beginPath();
       if (circular(it)) ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, 2 * Math.PI);
+      else if (it.forma === 'porta-dir') {
+        // dobradiça no canto inferior esquerdo, arco até o canto inferior direito
+        ctx.moveTo(-w / 2, h / 2);
+        ctx.lineTo(-w / 2, -h / 2);
+        ctx.ellipse(-w / 2, h / 2, w, h, 0, -Math.PI / 2, 0);
+        ctx.closePath();
+      } else if (it.forma === 'porta-esq') {
+        // espelho: dobradiça no canto inferior direito
+        ctx.moveTo(w / 2, h / 2);
+        ctx.lineTo(w / 2, -h / 2);
+        ctx.ellipse(w / 2, h / 2, w, h, 0, -Math.PI / 2, -Math.PI, true);
+        ctx.closePath();
+      }
       else ctx.rect(-w / 2, -h / 2, w, h);
       ctx.fillStyle = it.cor + 'b3';
       ctx.fill();

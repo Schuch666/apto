@@ -1,5 +1,6 @@
 // Catálogo padrão de móveis. Medidas em centímetros (comprimento × largura, vistas de cima).
-// forma: 'retangulo' (padrão) ou 'circulo' (vira elipse se comprimento ≠ largura).
+// forma: 'retangulo' (padrão), 'circulo' (vira elipse se comprimento ≠ largura) ou
+// 'porta-dir' / 'porta-esq' (1/4 de círculo: dobradiça no canto de baixo, folha abrindo para o lado indicado).
 // Para acrescentar itens fixos, adicione linhas aqui; itens criados pela página ficam salvos no navegador.
 window.CATALOGO_PADRAO = [
   { nome: 'Cama Queen', larg: 158, prof: 198, cor: '#c98a4f' },
@@ -9,6 +10,8 @@ window.CATALOGO_PADRAO = [
   { nome: 'Cadeira de praia', larg: 60, prof: 75, cor: '#00a676' },
   { nome: 'Criado-mudo', larg: 45, prof: 40, cor: '#64a6e8' },
   { nome: 'Mesa de bar', larg: 60, prof: 60, cor: '#3d7fc9', forma: 'circulo' },
+  { nome: 'Porta (direita)', larg: 80, prof: 80, cor: '#9aa2ac', forma: 'porta-dir' },
+  { nome: 'Porta (esquerda)', larg: 80, prof: 80, cor: '#9aa2ac', forma: 'porta-esq' },
 ];
 
 // Cores disponíveis para os móveis: cada linha é um tom em claro, médio e escuro
