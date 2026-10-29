@@ -1,0 +1,77 @@
+{
+  "escala": 168,
+  "catalogo": [
+    {
+      "nome": "Cama Queen",
+      "larg": 158,
+      "prof": 198,
+      "cor": "#c98a4f",
+      "forma": "retangulo"
+    },
+    {
+      "nome": "Banco",
+      "larg": 40,
+      "prof": 40,
+      "cor": "#9ccc65",
+      "forma": "circulo"
+    },
+    {
+      "nome": "Cadeira de escritório",
+      "larg": 65,
+      "prof": 65,
+      "cor": "#2e7d32",
+      "forma": "retangulo"
+    },
+    {
+      "nome": "Cadeira de jantar",
+      "larg": 50,
+      "prof": 50,
+      "cor": "#4caf50",
+      "forma": "circulo"
+    },
+    {
+      "nome": "Cadeira de praia",
+      "larg": 60,
+      "prof": 75,
+      "cor": "#00a676",
+      "forma": "retangulo"
+    },
+    {
+      "nome": "Criado-mudo",
+      "larg": 45,
+      "prof": 40,
+      "cor": "#64a6e8",
+      "forma": "retangulo"
+    },
+    {
+      "nome": "Mesa de bar",
+      "larg": 60,
+      "prof": 60,
+      "cor": "#3d7fc9",
+      "forma": "circulo"
+    }
+  ],
+  "itens": [
+    {
+      "id": "xxcavg9a",
+      "nome": "Cama Queen",
+      "larg": 158,
+      "prof": 198,
+      "cor": "#c98a4f",
+      "forma": "retangulo",
+      "rot": 90,
+      "x": 1.4945112217661936,
+      "y": 2.6271611587065844
+    }
+  ],
+  "padroes": [
+    "Cama Queen",
+    "Banco",
+    "Cadeira de escritório",
+    "Cadeira de jantar",
+    "Cadeira de praia",
+    "Criado-mudo",
+    "Mesa de bar"
+  ],
+  "nome": "default"
+}
