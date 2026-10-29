@@ -11,6 +11,7 @@
   const REPO_GH = 'Schuch666/apto';
   const PASTA_GH = 'layouts';
   const CHAVE_TOKEN = 'layout-apto-token';
+  const LAYOUT_PADRAO = 'default'; // layouts/default.json abre na primeira visita, se existir
   const $ = (id) => document.getElementById(id);
 
   const viewport = $('viewport');
@@ -20,6 +21,7 @@
   const camadaMedida = $('camadaMedida');
   const dica = $('dica');
 
+  const primeiraVisita = !carregar();
   let estado = carregar() || {
     escala: window.ESCALA_PADRAO,
     catalogo: window.CATALOGO_PADRAO.map((c) => ({ ...c })),
@@ -696,6 +698,20 @@
     }
   }
 
+  // primeira visita (nada salvo neste navegador): começa pelo layout padrão do GitHub, se houver
+  async function carregarPadraoGithub() {
+    try {
+      const r = await api(`/contents/${PASTA_GH}/${LAYOUT_PADRAO}.json`, { headers: { Accept: ACEITA_RAW } });
+      if (!r.ok) return; // sem layout padrão: segue com a planta vazia
+      const dados = JSON.parse(await r.text());
+      if (estado.itens.length) return; // a pessoa já começou a montar algo enquanto carregava
+      aplicarDados(dados);
+      avisar('Layout padrão carregado.', 'ok');
+    } catch (e) {
+      // sem rede ou arquivo inválido: segue com a planta vazia
+    }
+  }
+
   $('btnSalvarGh').onclick = salvarGithub;
   $('btnCarregarGh').onclick = carregarGithub;
 
@@ -777,6 +793,7 @@
 
   aplicarTema(temaSalvo());
   mostrarDataAtualizacao();
+  if (primeiraVisita) carregarPadraoGithub();
   if (planta.complete) ajustarVista();
   else planta.addEventListener('load', ajustarVista);
   window.addEventListener('resize', ajustarVista);

@@ -50,6 +50,12 @@ sem instalação e sem cadastro.
 
 Cada layout salvo vira um commit na `main`, o que também republica o site.
 
+#### Layout padrão
+
+Um layout salvo com o nome **default** (`layouts/default.json`) é aberto automaticamente na primeira
+visita de cada navegador, ou seja, quando ainda não há nada salvo nele. Quem já tem um layout no
+navegador continua com o seu; o padrão pode ser aberto a qualquer momento por **Carregar**.
+
 ### Escala
 
 A escala inicial (168 px/m) foi estimada pelas cotas do desenho, que não é perfeitamente
