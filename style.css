@@ -175,8 +175,10 @@ button.perigo { color: var(--perigo); }
 }
 .movel.circulo { border-radius: 50%; }
 /* portas: 1/4 de círculo com a dobradiça no canto de baixo */
-.movel.porta-dir { border-radius: 0 100% 0 0; }
-.movel.porta-esq { border-radius: 100% 0 0 0; }
+/* portas: sem borda; só o arco de abertura, pontilhado, desenhado em SVG por app.js */
+.movel.porta-dir { border-radius: 0 100% 0 0; border: none; }
+.movel.porta-esq { border-radius: 100% 0 0 0; border: none; }
+.movel .arco { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
 .movel.selecionado { outline: 3px solid var(--destaque); outline-offset: 2px; }
 .movel .rotulo {
   font-size: 22px;

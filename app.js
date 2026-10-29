@@ -68,6 +68,20 @@
   }
 
   const circular = (c) => c.forma === 'circulo';
+  const ehPorta = (c) => c.forma === 'porta-dir' || c.forma === 'porta-esq';
+  // opacidade do preenchimento: ~70% nos móveis, ~35% nas portas
+  const alfa = (c) => (ehPorta(c) ? '59' : 'b3');
+  const PONTILHADO = [8, 12]; // traço e intervalo do arco das portas, em px da planta
+
+  // arco de abertura da porta: dobradiça no canto inferior esquerdo (direita) ou direito (esquerda)
+  function arcoPorta(it, w, h) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'arco');
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    const d = it.forma === 'porta-dir' ? `M0,0 A${w},${h} 0 0 1 ${w},${h}` : `M${w},0 A${w},${h} 0 0 0 0,${h}`;
+    svg.innerHTML = `<path d="${d}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="${PONTILHADO.join(' ')}"/>`;
+    return svg;
+  }
   // classe CSS da forma (retângulo não precisa de classe)
   const classeForma = (c) => (c.forma && c.forma !== 'retangulo' ? ' ' + c.forma : '');
   // "Ø40" para círculos, "60×75" para o resto
@@ -176,13 +190,14 @@
       el.style.left = it.x * s + 'px';
       el.style.top = it.y * s + 'px';
       el.style.transform = `translate(-50%, -50%) rotate(${it.rot}deg)`;
-      el.style.background = it.cor + 'b3'; // ~70% de opacidade para ver a planta por baixo
+      el.style.background = it.cor + alfa(it); // translúcido para ver a planta por baixo
       const rot = document.createElement('div');
       rot.className = 'rotulo';
       rot.textContent = it.nome;
       const med = document.createElement('small');
       med.textContent = `${medidaTxt(it)} cm`;
       rot.appendChild(med);
+      if (ehPorta(it)) el.appendChild(arcoPorta(it, (it.larg / 100) * s, (it.prof / 100) * s));
       el.appendChild(rot);
       camadaItens.appendChild(el);
     });
@@ -743,26 +758,34 @@
       ctx.translate(it.x * s, it.y * s);
       ctx.rotate((it.rot * Math.PI) / 180);
       ctx.beginPath();
-      if (circular(it)) ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, 2 * Math.PI);
-      else if (it.forma === 'porta-dir') {
-        // dobradiça no canto inferior esquerdo, arco até o canto inferior direito
+      if (ehPorta(it)) {
+        // dobradiça no canto inferior esquerdo (direita) ou direito (esquerda); espelha no eixo x
+        const lado = it.forma === 'porta-dir' ? 1 : -1;
+        ctx.scale(lado, 1);
+        const arco = () => ctx.ellipse(-w / 2, h / 2, w, h, 0, -Math.PI / 2, 0);
         ctx.moveTo(-w / 2, h / 2);
         ctx.lineTo(-w / 2, -h / 2);
-        ctx.ellipse(-w / 2, h / 2, w, h, 0, -Math.PI / 2, 0);
+        arco();
         ctx.closePath();
-      } else if (it.forma === 'porta-esq') {
-        // espelho: dobradiça no canto inferior direito
-        ctx.moveTo(w / 2, h / 2);
-        ctx.lineTo(w / 2, -h / 2);
-        ctx.ellipse(w / 2, h / 2, w, h, 0, -Math.PI / 2, -Math.PI, true);
-        ctx.closePath();
+        ctx.fillStyle = it.cor + alfa(it);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#fff';
+        ctx.beginPath(); // só o arco de abertura, pontilhado
+        ctx.setLineDash(PONTILHADO);
+        arco();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.scale(lado, 1); // desfaz o espelho para o texto
+      } else {
+        if (circular(it)) ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, 2 * Math.PI);
+        else ctx.rect(-w / 2, -h / 2, w, h);
+        ctx.fillStyle = it.cor + alfa(it);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(0,0,0,.55)';
+        ctx.stroke();
       }
-      else ctx.rect(-w / 2, -h / 2, w, h);
-      ctx.fillStyle = it.cor + 'b3';
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(0,0,0,.55)';
-      ctx.stroke();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#fff';
