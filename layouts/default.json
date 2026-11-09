@@ -49,6 +49,27 @@
       "prof": 60,
       "cor": "#3d7fc9",
       "forma": "circulo"
+    },
+    {
+      "nome": "Porta (direita)",
+      "larg": 80,
+      "prof": 80,
+      "cor": "#9aa2ac",
+      "forma": "porta-dir"
+    },
+    {
+      "nome": "Porta (esquerda)",
+      "larg": 80,
+      "prof": 80,
+      "cor": "#9aa2ac",
+      "forma": "porta-esq"
+    },
+    {
+      "nome": "porta menor",
+      "larg": 60,
+      "prof": 60,
+      "cor": "#737d8c",
+      "forma": "porta-dir"
     }
   ],
   "itens": [
@@ -62,6 +83,61 @@
       "rot": 90,
       "x": 1.4945112217661936,
       "y": 2.6271611587065844
+    },
+    {
+      "id": "bhepxtzx",
+      "nome": "Porta (esquerda)",
+      "larg": 80,
+      "prof": 80,
+      "cor": "#9aa2ac",
+      "forma": "porta-esq",
+      "rot": 0,
+      "x": 2.6532145799141005,
+      "y": 4.52339614969143
+    },
+    {
+      "id": "4l8usmx0",
+      "nome": "Porta (direita)",
+      "larg": 80,
+      "prof": 80,
+      "cor": "#9aa2ac",
+      "forma": "porta-dir",
+      "rot": 0,
+      "x": 3.9492885000738993,
+      "y": 3.515339441015436
+    },
+    {
+      "id": "z0habgao",
+      "nome": "porta menor",
+      "larg": 60,
+      "prof": 60,
+      "cor": "#737d8c",
+      "forma": "porta-dir",
+      "rot": 180,
+      "x": 4.957344423968266,
+      "y": 5.2640086972375615
+    },
+    {
+      "id": "gg42b92y",
+      "nome": "Porta (esquerda)",
+      "larg": 80,
+      "prof": 80,
+      "cor": "#9aa2ac",
+      "forma": "porta-esq",
+      "rot": 0,
+      "x": 8.711839395192971,
+      "y": 6.9303881063888
+    },
+    {
+      "id": "ky9kdwoz",
+      "nome": "porta menor",
+      "larg": 60,
+      "prof": 60,
+      "cor": "#737d8c",
+      "forma": "porta-dir",
+      "rot": 180,
+      "x": 4.360739304991594,
+      "y": 6.848097082145471
     }
   ],
   "padroes": [
@@ -71,7 +147,9 @@
     "Cadeira de jantar",
     "Cadeira de praia",
     "Criado-mudo",
-    "Mesa de bar"
+    "Mesa de bar",
+    "Porta (direita)",
+    "Porta (esquerda)"
   ],
   "nome": "default"
 }
